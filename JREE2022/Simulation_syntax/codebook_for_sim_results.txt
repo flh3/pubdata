@@ -1,0 +1,28 @@
+Codebook for simulation results:
+
+NG: number of groups (clusters).
+GS: group size (number of observations per cluster).
+cv: coefficient of variation (0 = balanced clusters). This is constant (.25) in the main simulation.
+inter: controls the base prevalence rate (of the intercept).
+beta: effect size of the coefficients (set to a constant of .3 in the simulation).
+iccsd: varies the intraclass correlation coefficient.
+nonc_glm: how many glms did not converge properly/provide admissable results.
+nonc_glmm: how many glmms did not converge properly/provide admissable results.
+reps: how many replications for each condition.
+
+columns names with:
+
+- sebias: refers to the standard error bias.
+- cr2: for the cr2 (Bell and McCaffrey) estimator.
+- ml: when maximum likelihood is used for the glmm (not shown in the simulation results).
+- reml: when restricted maximum likelihood is used for the glmm.
+- cr0: for the cr0 (Liang and Zeger) estimator.
+- b0 to b4: refers to the corresponding regression coefficients (starting with the intercept b0).
+
+- power: refers to the empirical rejection rates (using alpha = .05).
+- bm: Bell and McCaffrey empirical degrees of freedom.
+- bw: between-within degrees of freedom.
+
+- cp: refers to coverage probabilities.
+- time: how long the condition took to complete the number of reps.
+- T00: Mean of Tau00 for the glmm.

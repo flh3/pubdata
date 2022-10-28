@@ -1,0 +1,46 @@
+Simulated data based on a cluster randomized controlled trial (CRCT) of a restorative practice intervention with 18 schools.
+
+A data frame with 4233 rows and 12 variables.
+
+Simulated data based on a cluster randomized controlled trial with 18 schools. Based on the evaluation by Gregory, Huang, and Ward-Seidel (2021)  (https://eric.ed.gov/?id=ED614590) of a restorative practice intervention. The intervention was hypothesized to reduce student disciplinary infractions. As a simulated dataset, do not base substantive conclusions using this dataset-- consult the original manuscript. 
+
+The data are provided as a sample dataset to illustrate the use of cluster robust standard errors using data with a few clusters (the Bell and McCaffrey, 2002 CR2 adjustment). The CR2  adjustment for binary outcomes is described in more detail in the manuscript in the Journal of Research on Educational Effectiveness (JREE; Huang, Zhang, & Li, 2022). 
+
+Nine schools were assigned to the treatment and nine schools to the control conditions. The outcome is the receipt of an office disciplinary referral (ODR; odr_post) while controlling for prior ODR (odr_pre). In each condition, there were three elementary, middle, and high schools. 
+
+
+usid
+Unique school identifier (the grouping variable).
+
+stype
+School type (elementary, middle, or high school).
+
+trt
+Treatment indicator. 1 = intervention; 0 = control.
+
+odr_post
+Office disciplinary referral outcome.
+
+odr_pre
+Office disciplinary referral (baseline).
+
+size
+School enrollment size (to the nearest hundred).
+
+female
+Student is female: 1 = yes.
+
+stype_ms
+Dummy code for school type; middle school.
+
+stype_elem
+Dummy code for school type; elementary school.
+
+stype_high
+Dummy code for school type; high school.
+
+race_Black
+Dummy code for student race/ethnicity; Black student.
+
+race_Hispanic
+Dummy code for student race/ethnicity; Hispanic student.
