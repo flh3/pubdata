@@ -1,6 +1,7 @@
 ## wrappers for WeMix to allow for plausible values
 ## 2023.05.10
 ## 2023.05.22
+## 2023.11.16 added AICbar
 
 mixPV <- function(fml, silent = FALSE, ...){
   res <- list() #empty list
@@ -64,7 +65,11 @@ glance.mixPV <- function(out, ...){
   m <- length(out)
   ns <- summary(out[[1]])$ngroups[1]
   ll <- sapply(out, \(x) x$lnl)
-  gof <- data.frame(Nobs = ns, N.pv = m)
+  p <- (nrow(out[[1]]$varDF) + length(coef(out[[1]])))
+  AICbar <- mean(-2 * ll) + (2 * p)
+  BICbar <- mean(-2 * ll) + (log(ns) * p)
+  gof <- data.frame(Nobs = ns, N.pv = m, AICbar = AICbar,
+    BICbar = BICbar)
   return(gof)
 }
 
