@@ -26,16 +26,16 @@ mixPV <- function(fml, silent = FALSE, ...){
 tidy.mixPV <- function(out, ...){
   m <- length(out)
   
-  re <- sapply(out, \(x) x$vars)
+  re <- sapply(out, FUN = function(x) x$vars)
   ns <- nrow(re)
-  rese <- sapply(out, \(x) x$varDF$SEvcov)
+  rese <- sapply(out, FUN = function(x) x$varDF$SEvcov)
   cfs <- rbind(sapply(out, coef), re)
-  ses <- rbind(sapply(out, \(x) x$SE), rese[1:ns,]) #this is the SE
+  ses <- rbind(sapply(out, FUN = function(x) x$SE), rese[1:ns,]) #this is the SE
  
   cfs.res <- rowMeans(cfs)
   if(names(cfs.res)[1] == '') names(cfs.res)[1] <- "(Intercept)"
   B <- apply(cfs, 1, var) #Vb
-  ubar <- apply(ses, 1, \(x) mean(x^2)) #Vw
+  ubar <- apply(ses, 1, FUN = function(x) mean(x^2)) #Vw
   adj <- (1 + (1/m))
   combvar <- ubar + adj * (B)
   ses.res <- sqrt(combvar)
@@ -64,7 +64,7 @@ tidy.mixPV <- function(out, ...){
 glance.mixPV <- function(out, ...){
   m <- length(out)
   ns <- summary(out[[1]])$ngroups[1]
-  ll <- sapply(out, \(x) x$lnl)
+  ll <- sapply(out, FUN = function(x) x$lnl)
   p <- (nrow(out[[1]]$varDF) + length(coef(out[[1]])))
   AICbar <- mean(-2 * ll) + (2 * p)
   BICbar <- mean(-2 * ll) + (log(ns) * p)
@@ -85,7 +85,7 @@ pool_pv <- function(Bs, SEs){
   ns <- ncol(cfs) #number of coefficients / estimates
   # does not inc number of covariances for rs models
   B <- apply(data.frame(cfs[,1:ns]), 2, var) #Vb
-  ubar <- apply(data.frame(ses[,1:ns]), 2, \(x) mean(x^2)) #Vw
+  ubar <- apply(data.frame(ses[,1:ns]), 2, FUN = function(x) mean(x^2)) #Vw
   adj <- (1 + (1/m))
   combvar <- ubar + adj * (B)
   ses.res <- sqrt(combvar)
@@ -118,13 +118,13 @@ summary.mixPV <- function(out){
   m <- length(out)
   
   #random effects
-  re <- lapply(out, \(x) x$vars)
-  rese <- lapply(out, \(x) x$varDF$SEvcov)
+  re <- lapply(out, FUN = function(x) x$vars)
+  rese <- lapply(out, FUN = function(x) x$varDF$SEvcov)
   re.final <- pool_pv(re, rese)
   
   #fixed effects
   cfs <- lapply(out, coef)
-  ses <- lapply(out, \(x) x$SE) #this is the SE
+  ses <- lapply(out, FUN = function(x) x$SE) #this is the SE
   ttable <- pool_pv(cfs, ses)
 
   res <- list(ttable = ttable[drop = F],
@@ -147,8 +147,8 @@ print.mPV <- function(x, ...){
 
 
 lrtPV <- function(mf, mr){ #for mixPV
-  nll <- sapply(mr, \(x) x$lnl)
-  fll <- sapply(mf, \(x) x$lnl)
+  nll <- sapply(mr, FUN = function(x) x$lnl)
+  fll <- sapply(mf, FUN = function(x) x$lnl)
   a1 <- summary(mr[[1]])
   a2 <- summary(mf[[1]])
   k.r <- length(mr[[1]]$theta) + length(mr[[1]]$coef)
