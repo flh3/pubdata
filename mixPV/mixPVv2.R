@@ -3,8 +3,10 @@
 ## 2023.05.22
 ## 2023.11.16 added AICbar as requested
 ## 2024.04.16 added Barnard and Rubin dof adjustment as the default
+## 2024.06.08 multicore experiment
 
-mixPV <- function(fml, silent = FALSE, ...){
+
+mixPV <- function(fml, data = NULL, mc = FALSE, silent = FALSE, ...){
   # require(WeMix)
   res <- list() #empty list
   xx <- deparse1(fml[[2]])
@@ -13,12 +15,33 @@ mixPV <- function(fml, silent = FALSE, ...){
   #nout <- length(outc) #number of outcomes
   pred <- fml[[3]]
   
-  res <- lapply(outc, function(x){
+  if(mc == FALSE){
+    res <- lapply(outc, function(x){
     if (silent == FALSE) cat("Analyzing plausible value:", x, "\n")
     newf <- reformulate(deparse(pred), response = x)
-    mix(newf, ...)
+    mix(newf, data = data, ...)}
+    )
+  } else { ## added multicore processing
+     ### using parallel processing, this works with Windows 
+    require(parallel)
+    cores <- detectCores() - 1
+    cat("Attempting to use", cores, "cores. Progress will not be displayed. Please wait.\n")
+    cl1 <- makeCluster(cores)
+    clusterEvalQ(cl1, 
+      library(WeMix)
+    )
+    
+    xx <- data
+    clusterExport(cl1, varlist = "xx")
+    res <- parLapply(cl1, outc, function(x){
+    # print(x)
+    newf <- reformulate(deparse(pred), response = x)
+    mix(newf, data = xx, ...)
+   
+    })
+    parallel::stopCluster(cl1)
+    
   }
-  )
   
   class(res) <- c("mixPV", 'list')
   return(res)
