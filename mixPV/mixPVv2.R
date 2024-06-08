@@ -7,7 +7,7 @@
 
 
 mixPV <- function(fml, data = NULL, mc = FALSE, silent = FALSE, ...){
-  # require(WeMix)
+  require(WeMix)
   res <- list() #empty list
   xx <- deparse1(fml[[2]])
   xx <- gsub(" ", "", xx)
@@ -25,6 +25,7 @@ mixPV <- function(fml, data = NULL, mc = FALSE, silent = FALSE, ...){
      ### using parallel processing, this works with Windows 
     require(parallel)
     cores <- detectCores() - 1
+    if(cores < 2) (stop("Unable to use multiple cores on this computer."))
     cat("Attempting to use", cores, "cores. Progress will not be displayed. Please wait.\n")
     cl1 <- makeCluster(cores)
     clusterEvalQ(cl1, 
@@ -32,7 +33,7 @@ mixPV <- function(fml, data = NULL, mc = FALSE, silent = FALSE, ...){
     )
     
     xx <- data
-    clusterExport(cl1, varlist = "xx")
+    clusterExport(cl1, varlist = "xx", envir = environment())
     res <- parLapply(cl1, outc, function(x){
     # print(x)
     newf <- reformulate(deparse(pred), response = x)
