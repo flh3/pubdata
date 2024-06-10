@@ -1,21 +1,6 @@
-
+source("https://raw.githubusercontent.com/flh3/pubdata/main/mixPV/mixPVv2.R")
 data(pisa2012, package = 'MLMusingR') 
 
-system.time({
-  m1 <- mixPV(pv1math + pv2math + pv3math + pv4math + pv5math ~
-                st29q03 + sc14q02 + st04q01 + escs + (escs|schoolid), 
-              weights = c('w_fstuwt', 'w_fschwt'), 
-              data = pisa2012)
-})
-
-
-
-system.time({
-  m1 <- mixPV(pv1math + pv2math + pv3math + pv4math + pv5math ~
-                st29q03 + sc14q02 + st04q01 + escs + (escs|schoolid), 
-              weights = c('w_fstuwt', 'w_fschwt'), 
-              data = pisa2012, mc = TRUE)
-})
 
 st <- Sys.time()
 m1a <- mixPV(pv1math + pv2math + pv3math + pv4math + pv5math ~
