@@ -4,7 +4,7 @@
 ## 2023.11.16 added AICbar as requested
 ## 2024.04.16 added Barnard and Rubin dof adjustment as the default
 ## 2024.06.08 multicore experiment
-
+## 2024.09.01 added scaling of level-1 variables; wscale
 
 mixPV <- function(fml, data = NULL, mc = FALSE, silent = FALSE, ...){
   require(WeMix)
@@ -221,7 +221,7 @@ lrtPV <- function(mf, mr){ #for mixPV
 
 wscale <- function(cluster, data, wt, type = 'cluster'){
   
-  if(type != 'cluster' & type != 'ecluster') {warning("Invalid cluster type.")}
+  if(type != 'cluster' & type != 'ecluster') {warning("Invalid scaling type.")}
   if(sum(is.na((data[,c(cluster, wt)]))) > 0) warning('Missing value/s in cluster or weight variable. Inspect your data.')
     
   if(type == 'cluster'){
