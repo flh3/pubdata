@@ -194,9 +194,9 @@ print.mPV <- function(x, ...){
   cat("Results of multilevel analyses with", x$gof$N.pv, "plausible values.\n")
   cat("Number of observations:", x$gof$Nobs, '\n')
   cat("\nEstimates for random effects: \n")
-  printCoefmat(x$reff[,-c(5:8)], digits = 3)
+  printCoefmat(x$reff[,-c(5:8), drop = FALSE], digits = 3)
   cat("\nEstimates for fixed effects: \n")
-  printCoefmat(x$ttable[,-c(5:8), drop = F], digits = 3)
+  printCoefmat(x$ttable[,-c(5:8), drop = FALSE], digits = 3)
   
 }
 
