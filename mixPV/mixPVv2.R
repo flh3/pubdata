@@ -30,6 +30,7 @@ mixPV <- function(fml, data = NULL, mc = FALSE, silent = FALSE, ...){
     cl1 <- makeCluster(cores)
     clusterEvalQ(cl1, 
       library(WeMix)
+      library(haven)
     )
     
     xx <- data
