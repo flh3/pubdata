@@ -28,9 +28,10 @@ mixPV <- function(fml, data = NULL, mc = FALSE, silent = FALSE, ...){
     if(cores < 2) (stop("Unable to use multiple cores on this computer."))
     cat("Attempting to use", cores, "cores. Progress will not be displayed. Please wait.\n")
     cl1 <- makeCluster(cores)
-    clusterEvalQ(cl1, 
+    clusterEvalQ(cl1, {
       library(WeMix)
       library(haven)
+      }
     )
     
     xx <- data
