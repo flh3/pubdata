@@ -14,7 +14,7 @@ mixPV <- function(fml, data = NULL, mc = FALSE, silent = FALSE, ...){
   outc <- unlist(strsplit(xx, split = '\\+'))
   #nout <- length(outc) #number of outcomes
   pred <- fml[[3]]
-
+  
   if(mc == FALSE){
     res <- lapply(outc, function(x){
     if (silent == FALSE) cat("Analyzing plausible value:", x, "\n")
@@ -22,28 +22,30 @@ mixPV <- function(fml, data = NULL, mc = FALSE, silent = FALSE, ...){
     mix(newf, data = data, ...)}
     )
   } else { ## added multicore processing
-     ### using parallel processing, this works with Windows
+     ### using parallel processing, this works with Windows 
     require(parallel)
     cores <- detectCores() - 1
     if(cores < 2) (stop("Unable to use multiple cores on this computer."))
     cat("Attempting to use", cores, "cores. Progress will not be displayed. Please wait.\n")
     cl1 <- makeCluster(cores)
-    clusterEvalQ(cl1,
+    clusterEvalQ(cl1, {
       library(WeMix)
+      library(haven)
+      }
     )
-
+    
     xx <- data
     clusterExport(cl1, varlist = "xx", envir = environment())
     res <- parLapply(cl1, outc, function(x){
     # print(x)
     newf <- reformulate(deparse(pred), response = x)
     mix(newf, data = xx, ...)
-
+   
     })
     parallel::stopCluster(cl1)
-
+    
   }
-
+  
   class(res) <- c("mixPV", 'list')
   return(res)
 }
@@ -51,13 +53,13 @@ mixPV <- function(fml, data = NULL, mc = FALSE, silent = FALSE, ...){
 
 tidy.mixPV <- function(out, dfadj = TRUE, ...){
   m <- length(out)
-
+  
   re <- sapply(out, FUN = function(x) x$vars)
   ns <- nrow(re)
   rese <- sapply(out, FUN = function(x) x$varDF$SEvcov)
   cfs <- rbind(sapply(out, coef), re)
   ses <- rbind(sapply(out, FUN = function(x) x$SE), rese[1:ns,]) #this is the SE
-
+ 
   cfs.res <- rowMeans(cfs)
   if(names(cfs.res)[1] == '') names(cfs.res)[1] <- "(Intercept)"
   B <- apply(cfs, 1, var) #Vb
@@ -70,12 +72,12 @@ tidy.mixPV <- function(out, dfadj = TRUE, ...){
   #from Graham
   RIV <- (B + (B / m)) / ubar #same
   term <- names(cfs.res)
-
+  
   if (dfadj){
     ###
     ns2 <- summary(out[[1]])$ngroups[1]
     k <- ns
-    lambda <- RIV / (1 + RIV)
+    lambda <- RIV / (1 + RIV) 
     adj2 <- ((ns2 - k) + 1) / ((ns2 - k) + 3)
     dfobs <- adj2 * ((ns2 - k) * (1 - lambda))
     dfold <- (m - 1) / lambda^2 # Rubin's way [no small sample adj]
@@ -83,14 +85,14 @@ tidy.mixPV <- function(out, dfadj = TRUE, ...){
     ## adjusted / Barnard Rubin for small sample
     dof <- (dfold * dfobs) / (dfold + dfobs) #mice way; Barnard & Rubin (1999)
   }
-
+  
   pv <- 2 * pt(-abs(tstat), dof)
   crit <- abs(qt(p = .025, df = dof)) #.05 / 2
-  conf.low <- cfs.res - crit * ses.res
-  conf.high <- cfs.res + crit * ses.res
+  conf.low <- cfs.res - crit * ses.res 
+  conf.high <- cfs.res + crit * ses.res 
   final <- data.frame(term = term,
-                      estimate = cfs.res,
-                      std.error = ses.res,
+                      estimate = cfs.res, 
+                      std.error = ses.res, 
                       statistic = tstat,
                       dof = dof,
                       conf.low = conf.low,
@@ -131,7 +133,7 @@ pool_pv <- function(Bs, SEs, ns2, dfadj = TRUE){
   ses.res <- sqrt(combvar)
   tstat <- cfs.res / ses.res
   dof <- (m - 1) * (1 + ((m * ubar) / ((m + 1) * B)))^2
-
+  
   #from Graham
   RIV <- (B + (B / m)) / ubar #same
   term <- names(cfs.res)
@@ -139,7 +141,7 @@ pool_pv <- function(Bs, SEs, ns2, dfadj = TRUE){
   ###
   if (dfadj){
     k <- ns #no of pred inc intercept
-    lambda <- RIV / (1 + RIV)
+    lambda <- RIV / (1 + RIV) 
     adj2 <- ((ns2 - k) + 1) / ((ns2 - k) + 3)
     dfobs <- adj2 * ((ns2 - k) * (1 - lambda))
     dfold <- (m - 1) / lambda^2 # Rubin's way same [no small sample adj]
@@ -147,15 +149,15 @@ pool_pv <- function(Bs, SEs, ns2, dfadj = TRUE){
     ## adjusted / Barnard Rubin for small sample
     dof <- (dfold * dfobs) / (dfold + dfobs) #mice way; Barnard & Rubin (1999)
   }
-
+  
   ###
   pv <- 2 * pt(-abs(tstat), dof)
   crit <- abs(qt(p = .025, df = dof)) #.05 / 2
-  conf.low <- cfs.res - crit * ses.res
-  conf.high <- cfs.res + crit * ses.res
+  conf.low <- cfs.res - crit * ses.res 
+  conf.high <- cfs.res + crit * ses.res 
   output <- cbind(
-    estimate = cfs.res,
-    std.error = ses.res,
+    estimate = cfs.res, 
+    std.error = ses.res, 
     statistic = tstat,
     df = dof,
     conf.low = conf.low,
@@ -165,7 +167,7 @@ pool_pv <- function(Bs, SEs, ns2, dfadj = TRUE){
     "Pr(>t)" = round(pv, 4)
   )
   return(output)
-
+  
 }
 
 summary.mixPV <- function(out, dfadj = TRUE, ...){
@@ -176,7 +178,7 @@ summary.mixPV <- function(out, dfadj = TRUE, ...){
   re <- lapply(out, FUN = function(x) x$vars)
   rese <- lapply(out, FUN = function(x) x$varDF$SEvcov)
   re.final <- pool_pv(re, rese, ns, dfadj)
-
+  
   #fixed effects
   cfs <- lapply(out, coef)
   ses <- lapply(out, FUN = function(x) x$SE) #this is the SE
@@ -197,7 +199,7 @@ print.mPV <- function(x, ...){
   printCoefmat(x$reff[,-c(5:8), drop = FALSE], digits = 3)
   cat("\nEstimates for fixed effects: \n")
   printCoefmat(x$ttable[,-c(5:8), drop = FALSE], digits = 3)
-
+  
 }
 
 
@@ -220,16 +222,16 @@ lrtPV <- function(mf, mr){ #for mixPV
 }
 
 wscale <- function(cluster, data, wt, type = 'cluster'){
-
+  
   if(type != 'cluster' & type != 'ecluster') {warning("Invalid scaling type.")}
   if(sum(is.na((data[,c(cluster, wt)]))) > 0) warning('Missing value/s in cluster or weight variable. Inspect your data.')
-
+    
   if(type == 'cluster'){
       ns <- as.numeric(ave(data[, cluster], data[, cluster], FUN = length)) #how many in cluster (numerator)
       swt <- ave(data[, wt], data[, cluster], FUN = sum) #sum of wij (denominator)
       swgt <- data[, wt] * (ns / swt) #wij x adjustment
-    }
-
+    } 
+    
   if(type == 'ecluster'){
       num <- ave(data[, wt], data[, cluster], FUN = sum)
       num <- num^2
@@ -238,30 +240,7 @@ wscale <- function(cluster, data, wt, type = 'cluster'){
       totwgt <- ave(data[, wt], data[, cluster], FUN = sum)
       swgt <- data[, wt] * (ess / totwgt)
     }
-
+    
     return(swgt) #scaled weight
-
-}
-
-r2_ns <- function(x, data){
-  ## Nakagawa and Schielzeth r2
-  ## only for two level RI models for now
-  ## BETA :: BETA :: BETA
-
-  tmp <- all.vars(formula(x$call))
-  n <- length(tmp)
-  fml <- paste(tmp[2:(n-1)], collapse = ' + ')
-  fml <- paste("~", fml)
-
-  X <- model.matrix(as.formula(fml), data)
-
-  sigmaf <- var(X %*% matrix(x$coef))
-  t00 = x$vars[1]
-  sig2 = x$vars[2]
-
-  r2m = (sigmaf) / (sigmaf + t00 + sig2)
-  r2c = (sigmaf + t00) / (sigmaf + t00 + sig2)
-
-  return(data.frame(r2m = r2m, r2c = r2c))
-
+  
 }
