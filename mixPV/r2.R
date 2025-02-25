@@ -6,7 +6,7 @@
 library(WeMix)
 library(MLMusingR)
 
-data(pisa2012) #lod dataset
+data(pisa2012) #load dataset
 pisa2012$one <- 1 #constant weight
 
 ##  testing using lmer and mix
