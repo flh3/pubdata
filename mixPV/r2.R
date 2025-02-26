@@ -26,6 +26,8 @@ m2 <- lmer(pv1math ~ st04q01 + escs + st29q03 + (1|schoolid),
 r2_ns <- function(x, data){
   ## nakagawa and schielzeth r2
   ## only for two level RI models for now
+  ## The RI models should be fine and RS is not needed due to the 
+  ## robust standard errors.
   ## BETA :: BETA :: BETA
   ## 2025.02.02
   
