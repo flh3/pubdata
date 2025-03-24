@@ -1,5 +1,5 @@
 ## Applied example showing TIMSS Germany data
-## AUT: XXXX
+## AUT: Francis L. Huang
 ## 2024.06.25
 ## 2024.10.04
 
